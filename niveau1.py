@@ -1,27 +1,4 @@
-class Node:
-    def __init__(self, val, x, y):
-        self.val = val
-        self.child = []
-        self.position = (x, y)
-
-class Minesweeper:
-    def __init__(self, text_file_with_grids_as_string=None):
-        if text_file_with_grids_as_string is not None:
-            # Ideally make the functions more dependant on the input
-
-
-            # Step 1. Determine Height and Length of each grid
-            self.read_grids_from_file_and_get_their_respective_size(text_file_with_grids_as_string)
-
-            # Step 2. Place each mine into their respective position in the 2D-array
-            self.recreate_grids_in_array()
-
-            # Step 3. Determine the number of mines adjacent to each position on the grid
-            self.determine_adjacent_mines()
-
-            # Step 4. Print the grids
-            self.print_the_grids()
-
+class Minesweeper_1:
     def determine_adjacent_mines(self, blank_space_character=0):
         for grid_number, grid in enumerate(self.grids):
             for x, row in enumerate(grid):
@@ -96,5 +73,19 @@ class Minesweeper:
             self.grids.append(grid_to_append)
             self.mine_positions_per_grid.append(mines)
 
+    def niveau_1_print_from_file(self, text_file_with_grids_as_string):
+        # Step 1. Determine Height and Length of each grid
+        self.read_grids_from_file_and_get_their_respective_size(text_file_with_grids_as_string)
+
+        # Step 2. Place each mine into their respective position in the 2D-array
+        self.recreate_grids_in_array()
+
+        # Step 3. Determine the number of mines adjacent to each position on the grid
+        self.determine_adjacent_mines()
+
+        # Step 4. Print the grids
+        self.print_the_grids()
+
 if __name__ == '__main__':
-    game = Minesweeper('grids.txt')
+    game = Minesweeper_1()
+    game.niveau_1_print_from_file('grids.txt')
