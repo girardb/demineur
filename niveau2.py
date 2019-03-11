@@ -7,6 +7,7 @@ from niveau1 import Minesweeper, Node
 def create_random_grid(self, grid_length, grid_height, number_of_mines):
     if number_of_mines is None:
         number_of_mines = int(0.15*grid_length*grid_height)
+    self.flags_count = number_of_mines
 
     self.grid_sizes = [[grid_height, grid_length]]
 
@@ -102,7 +103,7 @@ def create_graph_of_grid(self):
 def update_revealed_grid(self, move, position):
     x, y = position
 
-    if move == 'R': # reveal
+    if move == 'R' or move == 'r': # reveal
         if self.grids[0][x][y] == '*':
             print('You lost.')
             self.bomb_hit = True
@@ -113,11 +114,13 @@ def update_revealed_grid(self, move, position):
                 self.revealed_grid[tile_x][tile_y] = self.grids[0][tile_x][tile_y]
         else:
             self.revealed_grid[x][y] = self.grids[0][x][y]
-    elif move == 'F':
+    elif move == 'F' or move == 'f':
         if self.revealed_grid[x][y] == 'F':
             self.revealed_grid[x][y] = '-'
+            self.flags_count += 1
         else:
             self.revealed_grid[x][y] = 'F'
+            self.flags_count -= 1
 
     # Check win condition
     # Real ugly and definitely not efficient since I recreate the whole grid at every turn
@@ -131,10 +134,12 @@ def update_revealed_grid(self, move, position):
         self.game_won = True
 
 def play_a_game(self, grid_length=9, grid_height=9, number_of_mines=None):
+    self.flags_count = 0
     self.game_won = False
     self.bomb_hit = False
     self.create_random_grid(grid_length, grid_height, number_of_mines)
     self.create_graph_of_grid()
+    print(f'\nFlags left = {self.flags_count}')
     self.print_revealed_grid()
     print('')
 
@@ -144,6 +149,7 @@ def play_a_game(self, grid_length=9, grid_height=9, number_of_mines=None):
         position = move[1].strip('()').split(',')
         position[0] = int(position[0])
         position[1] = int(position[1])
+        position.reverse()
         action = move[0]
         self.update_revealed_grid(action, position)
         if self.bomb_hit is True:
@@ -151,31 +157,30 @@ def play_a_game(self, grid_length=9, grid_height=9, number_of_mines=None):
         if self.game_won is True:
             print('You won.')
             break
+        print(f'\nFlags left = {self.flags_count}')
         self.print_revealed_grid()
         print('')
 
-
-# Make it playable from command-line with inputs 'move (x, y)' # Use list(str.strip('(),'))
+Minesweeper.create_random_grid = create_random_grid
+Minesweeper.print_revealed_grid = print_revealed_grid
+Minesweeper.blank_space_BFS = blank_space_BFS
+Minesweeper.update_revealed_grid = update_revealed_grid
+Minesweeper.create_graph_of_grid = create_graph_of_grid
+Minesweeper.play_a_game = play_a_game
 
 if __name__ == '__main__':
-    Minesweeper.create_random_grid = create_random_grid
-    Minesweeper.print_revealed_grid = print_revealed_grid
-    Minesweeper.blank_space_BFS = blank_space_BFS
-    Minesweeper.update_revealed_grid = update_revealed_grid
-    Minesweeper.create_graph_of_grid = create_graph_of_grid
-    Minesweeper.play_a_game = play_a_game
-
-    print("To reveal a tile. Use : 'R (y,x)'")
-    print("To flag a tile. Use : 'F (y,x)'")
+    print("To reveal a tile, use : 'R (x,y)'")
+    print("To flag a tile, use : 'F (x,y)'")
     print('Good Luck!\n')
     print('Write the height of the grid.')
     HEIGTH_OF_GRID = int(input())
     print('Write the length of the grid.')
     LENGTH_OF_GRID = int(input())
-    print('Write the number of mines that you want in the grid.')
+    print('Write the number of mines in the grid.')
+    print("If you write '-1', an appropriate number of mines will be generated for the size of the grid.")
     NUMBER_OF_MINES = int(input())
 
-    if NUMBER_OF_MINES == '-1':
+    if NUMBER_OF_MINES == -1:
         NUMBER_OF_MINES = None
     elif NUMBER_OF_MINES > LENGTH_OF_GRID*HEIGTH_OF_GRID:
         NUMBER_OF_MINES = None
