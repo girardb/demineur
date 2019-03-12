@@ -70,8 +70,18 @@ class Board:
             visited.add(subtree_root.position)
         return visited
 
-    def print_board_seen_by_user(self):
-        for i in self.board_as_grid_user:
+    def print_board_seen_by_user(self): # suuuuuper long pour rien. Il faut changer ca.
+        grid_to_print = copy.deepcopy(self.board_as_grid_user)
+        first_row = [' ', ' '] + [str(i) for i in range(self.grid_size[1])]
+        second_row = [' ', ' '] + ['x' for i in range(self.grid_size[1])]
+        for i, row in enumerate(grid_to_print):
+            row.insert(0, str(i))
+            row.insert(1, 'x')
+
+        grid_to_print.insert(0, first_row)
+        grid_to_print.insert(1, second_row)
+
+        for i in grid_to_print:
             print(' '.join(i))
 
     def print_board_hidden_from_user(self):

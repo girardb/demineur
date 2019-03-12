@@ -36,4 +36,4 @@ class Minesweeper:
         action = None
         if len(player_move) == 2:
             action = player_move[1]
-        return [position[0], position[1], action]
+        return [position[1], position[0], action]
