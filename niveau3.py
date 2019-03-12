@@ -22,7 +22,7 @@ class SpecialButton(tk.Button):
             end_game_window = tk.Toplevel()
             message = tk.Message(end_game_window, text='You lost.')
             message.pack()
-        elif self.board.board_as_grid_hidden[x][y] == '0':
+        elif self.board.board_as_grid_hidden[x][y] == ' ': # Change here for blank space
             surrounding_tiles = self.board.blank_space_BFS(self.position)
             for tile in surrounding_tiles:
                 tile_row, tile_col = tile
@@ -48,6 +48,7 @@ list_buttons = []
 game = Minesweeper()
 game.create_board(3, 3, 1)
 game.board.create_random_grid()
+game.board.change_0s_to_blank_spaces()
 
 root = tk.Tk()
 frame=tk.Frame(root)

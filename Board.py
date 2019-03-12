@@ -42,7 +42,7 @@ class Board:
             row_hidden = []
             row_user = []
             for j in range(self.grid_size[1]):
-                row_hidden.append(str(self.tiles[i*self.grid_size[0] + j].val))
+                row_hidden.append(str(self.tiles[i*self.grid_size[0] + j].val)) # Change somewhere around here for blank spaces?
                 row_user.append(str(self.tiles[i*self.grid_size[0] + j].appearance))
             self.board_as_grid_hidden.append(row_hidden)
             self.board_as_grid_user.append(row_user)
@@ -63,9 +63,9 @@ class Board:
                 if child.position in visited:
                     continue
                 if child.position not in visited:
-                    if child.val != 0:
+                    if child.val != ' ':                # Changed here for blank spaces
                         visited.add(child.position)
-                    elif child.val == 0:
+                    elif child.val == ' ':                # Changed here for blank spaces
                         open_set.put(child)
             visited.add(subtree_root.position)
         return visited
@@ -87,16 +87,15 @@ class Board:
                 self.print_board_hidden_from_user()
                 self.bomb_hit = True
 
-            elif self.board_as_grid_hidden[x][y] == '0':
+            elif self.board_as_grid_hidden[x][y] == ' ': # Changed here for blank spaces
                 surrounding_tiles = self.blank_space_BFS(position)
-                print(len(surrounding_tiles))
                 for tile in surrounding_tiles:
                     tile_x, tile_y = tile
                     self.board_as_grid_user[tile_x][tile_y] = self.board_as_grid_hidden[tile_x][tile_y]
-                    self.tiles[tile_x*self.grid_size[0] + tile_y].appearance = self.tiles[tile_x*self.grid_size[0] + tile_y].val ###
+                    self.tiles[tile_x*self.grid_size[0] + tile_y].appearance = self.tiles[tile_x*self.grid_size[0] + tile_y].val
             else:
                 self.board_as_grid_user[x][y] = self.board_as_grid_hidden[x][y]
-                self.tiles[x*self.grid_size[0] + y].appearance = self.tiles[x*self.grid_size[0] + y].val ###
+                self.tiles[x*self.grid_size[0] + y].appearance = self.tiles[x*self.grid_size[0] + y].val
 
         elif move == 'f' or move == 'F':
             if self.board_as_grid_user[x][y] == 'F':
@@ -111,3 +110,20 @@ class Board:
     def check_win_condition(self):
         if all(tile.val == tile.appearance for tile in self.tiles if tile.val != '*'):
             self.game_won = True
+        return self.game_won
+
+    def change_0s_to_blank_spaces(self):
+        # C'est clair qu'il y a une manière plus efficace de faire ca
+        for tile in self.tiles:
+            if tile.val == 0:
+                tile.val = ' '
+
+        for x, row in enumerate(self.board_as_grid_user):
+            for y, column in enumerate(row):
+                if self.board_as_grid_user[x][y] == '0':
+                    self.board_as_grid_user[x][y] = ' '
+
+        for x, row in enumerate(self.board_as_grid_hidden):
+            for y, column in enumerate(row):
+                if self.board_as_grid_hidden[x][y] == '0':
+                    self.board_as_grid_hidden[x][y] = ' '
