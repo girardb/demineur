@@ -2,6 +2,7 @@ from Minesweeper import Minesweeper
 
 
 if __name__ == '__main__':
+    # Long startup time for some reason
     print("To reveal a tile, use : 'R (x,y)'")
     print("To flag a tile, use : 'F (x,y)'")
     print('Good Luck!\n')

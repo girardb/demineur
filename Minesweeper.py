@@ -1,5 +1,11 @@
 from Board import Board
 
+class InstructionError(Exception):
+    pass
+
+class OutOfBoundsError(Exception):
+    pass
+
 class Minesweeper:
     def __init__(self):
         self.board = None
