@@ -10,6 +10,12 @@ class Board:
         else:
             self.number_of_mines = number_of_mines
 
+        if grid_length is None:
+            grid_length = 9
+
+        if grid_height is None:
+            grid_height = 9
+
         self.grid_size = [grid_height, grid_length]
         self.flags_count = self.number_of_mines
         self.position_of_mines = []

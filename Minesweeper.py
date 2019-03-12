@@ -23,7 +23,7 @@ class Minesweeper:
 
         while not self.board.game_won and not self.board.bomb_hit:
 
-            vertical_position, horizontal_position, action = Minesweeper.player_input(input())
+            vertical_position, horizontal_position, action = self.player_input(input())
             self.board.update_board((vertical_position, horizontal_position), action)
             if self.board.bomb_hit:
                 break
@@ -35,11 +35,68 @@ class Minesweeper:
             self.board.print_board_seen_by_user()
             print('')
 
-    def player_input(input):
+    def start(self):
+        print("To reveal a tile, use : 'R (x,y)'")
+        print("To flag a tile, use : 'F (x,y)'")
+        print('Good Luck!\n')
+        print('Write the height of the grid.')
+        height_of_grid = Minesweeper.check_grid_configuration_inputs(input())
+
+        print('Write the length of the grid.')
+        length_of_grid = Minesweeper.check_grid_configuration_inputs(input())
+
+        print('Write the number of mines in the grid.')
+        print("If you write '-1', an appropriate number of mines will be generated for the size of the grid.")
+        number_of_mines = Minesweeper.check_grid_configuration_inputs(input(), length_of_grid=length_of_grid, height_of_grid=height_of_grid, mine=True)
+
+        self.play_a_game(length_of_grid, height_of_grid, number_of_mines)
+
+    def check_grid_configuration_inputs(input, length_of_grid=None, height_of_grid=None, mine=None):
+        if mine is True:
+            if length_of_grid == None:
+                length_of_grid = 9
+            if height_of_grid == None:
+                height_of_grid = 9
+
+
+        if not input.isdigit() and input != '-1':
+            raise InstructionError("This is not a number.")
+
+        if input == '-1':
+            return None
+
+        if int(input) <= 0 and input != '-1':
+            raise InstructionError("You can't ask for a grid with negative or zero components.")
+
+        if mine is True:
+            if int(input) > length_of_grid*height_of_grid:
+                raise InstructionError("This is way too many mines.")
+
+        return int(input)
+
+
+
+
+    def player_input(self, input):
         player_move = input.split()
         position = player_move[0].strip('().').split(',')
+
+        for i in position:
+            if not i.isdigit():
+                raise InstructionError("The position input is not well formated.")
+
+        if len(position) == 1:
+            raise InstructionError("You have to specify both the x and y coordinate.")
+
         position = [int(x) for x in position]
+
+        if position[0] >= self.board.grid_size[1] or position[0] < 0 or position[1] >=self.board.grid_size[0] or position[1] < 0:
+            raise OutOfBoundsError("The specified index is out the grid's bounds.")
+
         action = None
         if len(player_move) == 2:
+            if player_move[1] != 'f' and player_move[1] != 'F' and player_move[1] != 'r' and player_move[1] != 'R':
+                raise InstructionError("The desired action is not well formated.")
             action = player_move[1]
+
         return [position[1], position[0], action]
