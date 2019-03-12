@@ -11,8 +11,10 @@ class Board:
             self.number_of_mines = number_of_mines
 
         self.grid_size = [grid_height, grid_length]
-        self.flags_count = number_of_mines
+        self.flags_count = self.number_of_mines
         self.position_of_mines = []
+        self.game_won = False # Probably need to put this on the game class
+        self.bomb_hit = False # Probably need to put this on the game class
 
         # Create the tiles
         self.tiles = []
@@ -24,13 +26,14 @@ class Board:
 
     def create_random_grid(self):
         self.position_of_mines = random.sample(range(self.grid_size[0]*self.grid_size[1]), self.number_of_mines)
-        for tile in self.position_of_mines:
-            self.tiles[tile].bomb = True
-            self.tiles[tile].val = '*' # probablement moins efficace vue que pour certaines tiles .val est un int mais bon.
 
         for tile in self.tiles:
             tile.find_adjacent_positions()
-            #tile.find_child()
+            tile.find_child()
+
+        for tile in self.position_of_mines:
+            self.tiles[tile].bomb = True
+            self.tiles[tile].val = '*' # probablement moins efficace vue que pour certaines tiles .val est un int mais bon.
 
         # Create grid
         self.board_as_grid_hidden = []
@@ -45,13 +48,12 @@ class Board:
             self.board_as_grid_user.append(row_user)
 
     def blank_space_BFS(self, position):
-        x, y = position
         open_set = queue.Queue()
         visited = set()
 
         for tile in self.tiles:
-            if tile.position == (x, y):
-                root = node
+            if tile.position == position:
+                root = tile
         open_set.put(root)
 
         while not open_set.empty():
@@ -69,9 +71,43 @@ class Board:
         return visited
 
     def print_board_seen_by_user(self):
-        for i in self.board_as_grid_hidden:
+        for i in self.board_as_grid_user:
             print(' '.join(i))
 
     def print_board_hidden_from_user(self):
-        for i in self.board_as_grid_user:
+        for i in self.board_as_grid_hidden:
             print(' '.join(i))
+
+    def update_board(self, position, move):
+        x, y = position
+
+        if move == 'r' or move == 'R' or move == None:
+            if self.board_as_grid_hidden[x][y] == '*':
+                print('You lost.')
+                self.print_board_hidden_from_user()
+                self.bomb_hit = True
+
+            elif self.board_as_grid_hidden[x][y] == '0':
+                surrounding_tiles = self.blank_space_BFS(position)
+                print(len(surrounding_tiles))
+                for tile in surrounding_tiles:
+                    tile_x, tile_y = tile
+                    self.board_as_grid_user[tile_x][tile_y] = self.board_as_grid_hidden[tile_x][tile_y]
+                    self.tiles[tile_x*self.grid_size[0] + tile_y].appearance = self.tiles[tile_x*self.grid_size[0] + tile_y].val ###
+            else:
+                self.board_as_grid_user[x][y] = self.board_as_grid_hidden[x][y]
+                self.tiles[x*self.grid_size[0] + y].appearance = self.tiles[x*self.grid_size[0] + y].val ###
+
+        elif move == 'f' or move == 'F':
+            if self.board_as_grid_user[x][y] == 'F':
+                self.board_as_grid_user[x][y] = '-'
+                self.flags_count += 1
+            else:
+                self.board_as_grid_user[x][y] = 'F'
+                self.flags_count -= 1
+
+        self.check_win_condition()
+
+    def check_win_condition(self):
+        if all(tile.val == tile.appearance for tile in self.tiles if tile.val != '*'):
+            self.game_won = True

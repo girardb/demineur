@@ -6,15 +6,14 @@ class Tile:
         self.bomb = bomb
         self.appearance = appear_as
 
-        self.adjacent_positions = self.find_adjacent_positions()
-        #self.child = self.find_child()
+        self.adjacent_positions = []
+        self.child = []
 
     def __str__(self):
         return self.appearance
 
     def find_adjacent_positions(self):
         x, y = self.position
-        self.adjacent_positions = []
 
         for i in range(-1, 2):
             for j in range(-1, 2):
@@ -27,10 +26,8 @@ class Tile:
             tile_index = x*self.board.grid_size[0] + y
             if tile_index in self.board.position_of_mines:
                 self.val += 1
-"""
+
     def find_child(self):
-        self.child = []
         for tile in self.board.tiles:
             if tile.position in self.adjacent_positions:
                 self.child.append(tile)
-"""
