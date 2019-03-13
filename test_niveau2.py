@@ -1,5 +1,5 @@
 import pytest
-from Minesweeper import Minesweeper, InstructionError, OutOfBoundsError
+from Minesweeper import Minesweeper, InstructionError, OutOfBoundsError, check_grid_configuration_inputs
 
 def create_standard_grid():
     game = Minesweeper()
@@ -57,55 +57,55 @@ class TestPlayerInput(object):
 class TestCheckGridConfigurationInput(object):
     def test_check_grid_configuration_input_1(self): # Negative height and length
         with pytest.raises(InstructionError) as excinfo:
-            Minesweeper.check_grid_configuration_inputs('-3')
+            check_grid_configuration_inputs('-3')
 
     def test_check_grid_configuration_input_2(self): # Negative number of mines
         with pytest.raises(InstructionError) as excinfo:
-            Minesweeper.check_grid_configuration_inputs('-2', length_of_grid=9, height_of_grid=9, mine=True)
+            check_grid_configuration_inputs('-2', length_of_grid=9, height_of_grid=9, mine=True)
 
 
     def test_check_grid_configuration_input_3(self): # Number of mines > grid_length*grid_height
         with pytest.raises(InstructionError) as excinfo:
-            Minesweeper.check_grid_configuration_inputs('-7', length_of_grid=2, height_of_grid=2, mine=True)
+            check_grid_configuration_inputs('-7', length_of_grid=2, height_of_grid=2, mine=True)
 
     def test_check_grid_configuration_input_4(self): # Number of mines > grid_length*grid_height
         with pytest.raises(InstructionError) as excinfo:
-            Minesweeper.check_grid_configuration_inputs('7', length_of_grid=2, height_of_grid=2, mine=True)
+            check_grid_configuration_inputs('7', length_of_grid=2, height_of_grid=2, mine=True)
 
     def test_check_grid_configuration_input_5(self): # Length NaN
         with pytest.raises(InstructionError) as excinfo:
-            Minesweeper.check_grid_configuration_inputs('aaa aa')
+            check_grid_configuration_inputs('aaa aa')
 
     def test_check_grid_configuration_input_6(self): # Height NaN
         with pytest.raises(InstructionError) as excinfo:
-            Minesweeper.check_grid_configuration_inputs('aaa')
+            check_grid_configuration_inputs('aaa')
 
     def test_check_grid_configuration_input_7(self): # Number of mines NaN
         with pytest.raises(InstructionError) as excinfo:
-            Minesweeper.check_grid_configuration_inputs(' aa', length_of_grid=9, height_of_grid=9, mine=True)
+            check_grid_configuration_inputs(' aa', length_of_grid=9, height_of_grid=9, mine=True)
 
     def test_check_grid_configuration_input_8(self): # Appropriate number of mines
-        assert Minesweeper.check_grid_configuration_inputs('3', length_of_grid=9, height_of_grid=9, mine=True) == 3
+        assert check_grid_configuration_inputs('3', length_of_grid=9, height_of_grid=9, mine=True) == 3
 
     def test_check_grid_configuration_input_9(self):
-        assert Minesweeper.check_grid_configuration_inputs('3') == 3
+        assert check_grid_configuration_inputs('3') == 3
 
     def test_check_grid_configuration_input_10(self):
-        assert Minesweeper.check_grid_configuration_inputs('-1') == None
+        assert check_grid_configuration_inputs('-1') == None
 
     def test_check_grid_configuration_input_11(self):
-        assert Minesweeper.check_grid_configuration_inputs('-1', length_of_grid=9, height_of_grid=9, mine=True) == None
+        assert check_grid_configuration_inputs('-1', length_of_grid=9, height_of_grid=9, mine=True) == None
 
     def test_check_grid_configuration_input_12(self):
-        assert Minesweeper.check_grid_configuration_inputs('-1', length_of_grid=None, height_of_grid=None, mine=True) == None
+        assert check_grid_configuration_inputs('-1', length_of_grid=None, height_of_grid=None, mine=True) == None
 
     def test_check_grid_configuration_input_13(self):
-        assert Minesweeper.check_grid_configuration_inputs('4', length_of_grid=None, height_of_grid=None, mine=True) == 4
+        assert check_grid_configuration_inputs('4', length_of_grid=None, height_of_grid=None, mine=True) == 4
 
     def test_check_grid_configuration_input_14(self):
         with pytest.raises(InstructionError) as excinfo:
-            Minesweeper.check_grid_configuration_inputs('-4', length_of_grid=3, height_of_grid=None, mine=True)
+            check_grid_configuration_inputs('-4', length_of_grid=3, height_of_grid=None, mine=True)
 
     def test_check_grid_configuration_input_14(self):
         with pytest.raises(InstructionError) as excinfo:
-            Minesweeper.check_grid_configuration_inputs('0')
+            check_grid_configuration_inputs('0')
