@@ -1,11 +1,11 @@
 """Creates the Tile class to be used by the Board class for a Minesweeper game."""
 class Tile:
     """Creates the tile for a Minesweeper board/grid."""
-    def __init__(self, board, val, x, y, bomb, appear_as='-'):
+    def __init__(self, board, val, height, length, bomb, appear_as='-'):
         """Initializes the tile."""
         self.board = board
         self.val = val
-        self.position = (x, y)
+        self.position = (height, length)
         self.bomb = bomb
         self.appearance = appear_as
         self.adjacent_positions = []
@@ -27,7 +27,7 @@ class Tile:
 
         for adjacent_tile in self.adjacent_positions:
             pos_r, pos_c = adjacent_tile
-            tile_index = pos_r*self.board.grid_size[0] + pos_c
+            tile_index = pos_r*self.board.grid_size[1] + pos_c
             if tile_index in self.board.position_of_mines:
                 self.val += 1
 
@@ -35,7 +35,7 @@ class Tile:
         """Finds the children of a tile.
 
         It will be useful when the board is seen as a graph and Breadth-first
-        search will be used to find all the connected blank spaces to reveal.
+        search is used to find all the connected blank spaces to reveal.
         """
         for tile in self.board.tiles:
             if tile.position in self.adjacent_positions:

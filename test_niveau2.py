@@ -54,6 +54,16 @@ class TestPlayerInput(object):
         with pytest.raises(OutOfBoundsError) as excinfo:
             game.player_input('9,9')
 
+    def test_player_input_11(self):
+        game = create_standard_grid()
+        with pytest.raises(InstructionError) as excinfo:
+            game.player_input('')
+
+    def test_player_input_12(self):
+        game = create_standard_grid()
+        with pytest.raises(InstructionError) as excinfo:
+            game.player_input(' ')
+
 class TestCheckGridConfigurationInput(object):
     def test_check_grid_configuration_input_1(self): # Negative height and length
         with pytest.raises(InstructionError) as excinfo:

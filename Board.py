@@ -64,8 +64,8 @@ class Board:
             row_hidden = []
             row_user = []
             for j in range(self.grid_size[1]):
-                row_hidden.append(str(self.tiles[i*self.grid_size[0] + j].val))
-                row_user.append(str(self.tiles[i*self.grid_size[0] + j].appearance))
+                row_hidden.append(str(self.tiles[i*self.grid_size[1] + j].val)) ###
+                row_user.append(str(self.tiles[i*self.grid_size[1] + j].appearance)) ###
             self.board_as_grid_hidden.append(row_hidden)
             self.board_as_grid_user.append(row_user)
 
@@ -133,10 +133,10 @@ class Board:
                 for tile in surrounding_tiles:
                     tile_x, tile_y = tile
                     self.board_as_grid_user[tile_x][tile_y] = self.board_as_grid_hidden[tile_x][tile_y]
-                    self.tiles[tile_x*self.grid_size[0] + tile_y].appearance = self.tiles[tile_x*self.grid_size[0] + tile_y].val
+                    self.tiles[tile_x*self.grid_size[1] + tile_y].appearance = self.tiles[tile_x*self.grid_size[1] + tile_y].val
             else:
                 self.board_as_grid_user[pos_r][pos_c] = self.board_as_grid_hidden[pos_r][pos_c]
-                self.tiles[pos_r*self.grid_size[0] + pos_c].appearance = self.tiles[pos_r*self.grid_size[0] + pos_c].val
+                self.tiles[pos_r*self.grid_size[1] + pos_c].appearance = self.tiles[pos_r*self.grid_size[1] + pos_c].val
 
         elif move == 'f' or move == 'F':
             if self.board_as_grid_user[pos_r][pos_c] == 'F':
@@ -166,7 +166,7 @@ class Board:
                 if self.board_as_grid_user[pos_r][pos_c] == '0':
                     self.board_as_grid_user[pos_r][pos_c] = ' '
 
-        for pos_r, row in enumerate(self.board_as_grid_hidden):
+        for pos_r, row in enumerate(self.board_as_grid_hidden): # Même code que lui en haut. jpeux les merge
             for pos_c in range(len(row)):
                 if self.board_as_grid_hidden[pos_r][pos_c] == '0':
                     self.board_as_grid_hidden[pos_r][pos_c] = ' '
