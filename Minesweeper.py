@@ -23,7 +23,15 @@ class Minesweeper:
 
         while not self.board.game_won and not self.board.bomb_hit:
 
-            vertical_position, horizontal_position, action = self.player_input(input())
+            correct_input = False
+            while not correct_input:
+                try:
+                    vertical_position, horizontal_position, action = self.player_input(input())
+                    correct_input = True
+                except (InstructionError, OutOfBoundsError) as error:
+                    print(error)
+                    #print('You made an error')
+
             self.board.update_board((vertical_position, horizontal_position), action)
             if self.board.bomb_hit:
                 break
@@ -36,20 +44,48 @@ class Minesweeper:
             print('')
 
     def start(self):
-        print("To reveal a tile, use : 'R (x,y)'")
-        print("To flag a tile, use : 'F (x,y)'")
+        print("To reveal a tile, use : 'x,y'")
+        print("To flag a tile, use : 'x,y F'")
         print('Good Luck!\n')
         print('Write the height of the grid.')
-        height_of_grid = Minesweeper.check_grid_configuration_inputs(input())
+        print("If you write '-1', the height of the grid will of standard height 9.")
+
+        correct_input = False
+        while not correct_input:
+            try:
+                height_of_grid = Minesweeper.check_grid_configuration_inputs(input())
+                correct_input = True
+            except InstructionError as error:
+                print(error)
+                print('You entered the height incorrectly. You should try again.')
+
 
         print('Write the length of the grid.')
-        length_of_grid = Minesweeper.check_grid_configuration_inputs(input())
+        print("If you write '-1', the length of the grid will of standard length 9.")
+
+        correct_input = False
+        while not correct_input:
+            try:
+                length_of_grid = Minesweeper.check_grid_configuration_inputs(input())
+                correct_input = True
+            except InstructionError as error:
+                print(error)
+                print('You entered the length incorrectly. You should try again.')
 
         print('Write the number of mines in the grid.')
         print("If you write '-1', an appropriate number of mines will be generated for the size of the grid.")
-        number_of_mines = Minesweeper.check_grid_configuration_inputs(input(), length_of_grid=length_of_grid, height_of_grid=height_of_grid, mine=True)
+
+        correct_input = False
+        while not correct_input:
+            try:
+                number_of_mines = Minesweeper.check_grid_configuration_inputs(input(), length_of_grid=length_of_grid, height_of_grid=height_of_grid, mine=True)
+                correct_input = True
+            except InstructionError as error:
+                print(error)
+                print('you entered the number of mines incorrectly. You should try again.')
 
         self.play_a_game(length_of_grid, height_of_grid, number_of_mines)
+
 
     def check_grid_configuration_inputs(input, length_of_grid=None, height_of_grid=None, mine=None):
         if mine is True:
@@ -58,12 +94,11 @@ class Minesweeper:
             if height_of_grid == None:
                 height_of_grid = 9
 
-
-        if not input.isdigit() and input != '-1':
-            raise InstructionError("This is not a number.")
-
         if input == '-1':
             return None
+
+        if not input.strip('-').isdigit() and input != '-1':
+            raise InstructionError("This is not a number.")
 
         if int(input) <= 0 and input != '-1':
             raise InstructionError("You can't ask for a grid with negative or zero components.")
@@ -75,14 +110,15 @@ class Minesweeper:
         return int(input)
 
 
-
-
     def player_input(self, input):
+        if input == 'quit':
+            quit()
+
         player_move = input.split()
         position = player_move[0].strip('().').split(',')
 
         for i in position:
-            if not i.isdigit():
+            if not i.strip('-').isdigit():
                 raise InstructionError("The position input is not well formated.")
 
         if len(position) == 1:

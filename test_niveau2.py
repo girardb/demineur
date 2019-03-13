@@ -1,79 +1,56 @@
 import pytest
 from Minesweeper import Minesweeper, InstructionError, OutOfBoundsError
 
+def create_standard_grid():
+    game = Minesweeper()
+    game.create_board(3, 3, 1)
+    game.board.create_random_grid()
+    game.board.change_0s_to_blank_spaces()
+    return game
+
 class TestPlayerInput(object):
     def test_player_input_1(self):
-        game = Minesweeper()
-        game.create_board(3, 3, 1)
-        game.board.create_random_grid()
-        game.board.change_0s_to_blank_spaces()
+        game = create_standard_grid()
         assert game.player_input('0,0') == [0, 0, None]
 
     def test_player_input_2(self):
-        game = Minesweeper()
-        game.create_board(3, 3, 1)
-        game.board.create_random_grid()
-        game.board.change_0s_to_blank_spaces()
+        game = create_standard_grid()
         with pytest.raises(InstructionError) as excinfo:
             game.player_input('0000aaaa aaaa')
 
     def test_player_input_3(self):
-        game = Minesweeper()
-        game.create_board(3, 3, 1)
-        game.board.create_random_grid()
-        game.board.change_0s_to_blank_spaces()
+        game = create_standard_grid()
         with pytest.raises(InstructionError) as excinfo:
             game.player_input('a000aaa')
 
     def test_player_input_4(self):
-        game = Minesweeper()
-        game.create_board(3, 3, 1)
-        game.board.create_random_grid()
-        game.board.change_0s_to_blank_spaces()
+        game = create_standard_grid()
         with pytest.raises(InstructionError) as excinfo:
             game.player_input('0,0 k')
 
     def test_player_input_5(self):
-        game = Minesweeper()
-        game.create_board(3, 3, 1)
-        game.board.create_random_grid()
-        game.board.change_0s_to_blank_spaces()
+        game = create_standard_grid()
         with pytest.raises(InstructionError) as excinfo:
             game.player_input('00 f')
 
     def test_player_input_6(self):
-        game = Minesweeper()
-        game.create_board(3, 3, 1)
-        game.board.create_random_grid()
-        game.board.change_0s_to_blank_spaces()
+        game = create_standard_grid()
         assert game.player_input('0,0 f') == [0, 0, 'f']
 
     def test_player_input_7(self):
-        game = Minesweeper()
-        game.create_board(3, 3, 1)
-        game.board.create_random_grid()
-        game.board.change_0s_to_blank_spaces()
+        game = create_standard_grid()
         assert game.player_input('0,0 F') == [0, 0, 'F']
 
     def test_player_input_8(self):
-        game = Minesweeper()
-        game.create_board(3, 3, 1)
-        game.board.create_random_grid()
-        game.board.change_0s_to_blank_spaces()
+        game = create_standard_grid()
         assert game.player_input('0,0 r') == [0, 0, 'r']
 
     def test_player_input_9(self):
-        game = Minesweeper()
-        game.create_board(3, 3, 1)
-        game.board.create_random_grid()
-        game.board.change_0s_to_blank_spaces()
+        game = create_standard_grid()
         assert game.player_input('0,0 R') == [0, 0, 'R']
 
     def test_player_input_10(self):
-        game = Minesweeper()
-        game.create_board(3, 3, 1)
-        game.board.create_random_grid()
-        game.board.change_0s_to_blank_spaces()
+        game = create_standard_grid()
         with pytest.raises(OutOfBoundsError) as excinfo:
             game.player_input('9,9')
 

@@ -5,16 +5,16 @@ from Tile import Tile
 
 class Board:
     def __init__(self, grid_length, grid_height, number_of_mines):
-        if number_of_mines is None:
-            self.number_of_mines = int(0.15*grid_length*grid_height)
-        else:
-            self.number_of_mines = number_of_mines
-
         if grid_length is None:
             grid_length = 9
 
         if grid_height is None:
             grid_height = 9
+            
+        if number_of_mines is None:
+            self.number_of_mines = int(0.15*grid_length*grid_height)
+        else:
+            self.number_of_mines = number_of_mines
 
         self.grid_size = [grid_height, grid_length]
         self.flags_count = self.number_of_mines
