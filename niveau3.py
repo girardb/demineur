@@ -1,5 +1,6 @@
 import tkinter as tk
 from Minesweeper import Minesweeper
+from functools import partial
 
 # TODO:
 # SHOULD I CHANGE THE DESIGN SO THAT THE FIRST TILE SELECTED IS AN EMPTY TILE # HOW
@@ -9,6 +10,76 @@ from Minesweeper import Minesweeper
 # ADD FLAG COUNTER
 # ADD BORDERS --- jpas capable d'ajouter de border sur la grid. ca a l'air un peu off
 # SOMETHING TO CHOOSE SIZE AND NUMBER OF MINES # MENU
+# ON THE GAME LOST WINDOW -> ASK TO EXIT OR PLAY AGAIN
+# ON THE GAME WON WINDOW -> ASK TO EXIT OR PLAY AGAIN
+
+def open_settings_window():
+    settings_window = tk.Toplevel()
+    settings_window.wm_title('Settings')
+
+    settings_window_frame = tk.Frame(settings_window)
+    settings_window_frame.grid()
+
+    height_label = tk.Label(master=settings_window_frame, text='Height').grid(row=0, column=0)
+    global height_entry # GLOBAL :(
+    height_entry = tk.Entry(master=settings_window_frame).grid(row=0, column=1)
+
+    length_label = tk.Label(master=settings_window_frame, text='Length').grid(row=1, column=0)
+    global length_entry # GLOBAL :(
+    length_entry = tk.Entry(master=settings_window_frame).grid(row=1, column=1)
+
+    mines_label = tk.Label(master=settings_window_frame, text='Number of Mines').grid(row=2, column=0)
+    global mines_entry # GLOBAL :(
+    mines_entry = tk.Entry(master=settings_window_frame).grid(row=2, column=1)
+
+    create_board_button = tk.Button(master=settings_window_frame,
+                                    text='Create Board',
+                                    command=get_settings)
+    create_board_button.grid(row=3)
+
+def get_settings():
+
+    # Check if entries were entered
+    if height_entry is not None:
+        height = height_entry.get()
+    else:
+        height = '9' # pas le plus clean
+
+    if length_entry is not None:
+        length = length_entry.get()
+    else:
+        length = '9' # pas le plus clean
+
+    if mines_entry is not None:
+        mines = mines_entry.get()
+    else:
+        mines = '12' # pas le plus clean
+
+    # Check if the entries were numbers
+    if height.isdigit():
+        height = int(height)
+    else:
+        height = 9
+
+    if length.isdigit():
+        length = int(length)
+    else:
+        length = 9
+
+    if mines.isdigit():
+        if int(mines) < height*length:
+            mines = int(mines)
+        else:
+            mines = int(0.12345*length*height)
+    else:
+        mines = int(0.12345*length*height)
+
+    new_grid_window() ####
+
+def new_grid_window(): # CREATE FUNCTION THAT RECREATES THE WHOLE GRID AND SHIT WINDOW
+    pass
+
+
 
 class SpecialButton(tk.Button):
     def __init__(self, master=None, tile=None, rrow=None, ccolumn=None, **kw):
@@ -105,9 +176,42 @@ game.create_board(9, 9, 10)
 game.board.create_random_grid()
 game.board.change_0s_to_blank_spaces()
 
+
+
+# Create window
 root = tk.Tk()
 root.wm_title("Minesweeper")
 root.iconbitmap("images/Minesweeper_Game_icon.ico")
+
+# Load images
+image_tile_1 = tk.PhotoImage(file='images/tile_1.png')
+image_tile_2 = tk.PhotoImage(file='images/tile_2.png')
+image_tile_3 = tk.PhotoImage(file='images/tile_3.png')
+image_tile_4 = tk.PhotoImage(file='images/tile_4.png')
+image_tile_5 = tk.PhotoImage(file='images/tile_5.png')
+image_tile_6 = tk.PhotoImage(file='images/tile_6.png')
+image_tile_7 = tk.PhotoImage(file='images/tile_7.png')
+image_tile_8 = tk.PhotoImage(file='images/tile_8.png')
+image_flag = tk.PhotoImage(file='images/flag.png')
+image_mine = tk.PhotoImage(file='images/mine.png')
+image_full_tile = tk.PhotoImage(file='images/full_tile.png')
+image_discovered_tile = tk.PhotoImage(file='images/empty_tile.png')
+image_red_mine = tk.PhotoImage(file='images/red_mine.png')
+
+# Add menu
+menubar = tk.Menu(root)
+gamemenu = tk.Menu(menubar, tearoff=0)
+gamemenu.add_command(label='Settings', command=open_settings_window)
+menubar.add_cascade(label='Game', menu=gamemenu)
+
+helpmenu = tk.Menu(menubar, tearoff=0)
+helpmenu.add_command(label="You don't need help lol.", command=lambda: None)
+menubar.add_cascade(label='Help', menu=helpmenu)
+
+# Display Menu
+root.config(menu=menubar)
+
+
 
 # FRAME WHOLE WINDOW
 frame_whole_window = tk.Frame(root)
@@ -152,21 +256,6 @@ counter_placeholder = tk.Label(frame_time_counter,
 frame=tk.Frame(frame_whole_window)
 frame.grid(row=1, column=0, padx=5, pady=10)
 frame.config(background='#C0C0C0')
-
-# Load images
-image_tile_1 = tk.PhotoImage(file='images/tile_1.png')
-image_tile_2 = tk.PhotoImage(file='images/tile_2.png')
-image_tile_3 = tk.PhotoImage(file='images/tile_3.png')
-image_tile_4 = tk.PhotoImage(file='images/tile_4.png')
-image_tile_5 = tk.PhotoImage(file='images/tile_5.png')
-image_tile_6 = tk.PhotoImage(file='images/tile_6.png')
-image_tile_7 = tk.PhotoImage(file='images/tile_7.png')
-image_tile_8 = tk.PhotoImage(file='images/tile_8.png')
-image_flag = tk.PhotoImage(file='images/flag.png')
-image_mine = tk.PhotoImage(file='images/mine.png')
-image_full_tile = tk.PhotoImage(file='images/full_tile.png')
-image_discovered_tile = tk.PhotoImage(file='images/empty_tile.png')
-image_red_mine = tk.PhotoImage(file='images/red_mine.png')
 
 # Create board seen by the user
 for i, tile in enumerate(game.board.tiles):
