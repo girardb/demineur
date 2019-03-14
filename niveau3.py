@@ -3,6 +3,7 @@ from Minesweeper import Minesweeper
 from functools import partial
 
 # TODO:
+# METTRE L'APP DANS UNE CLASSE. ca va faciliter une couple d'affaires comme quand il faut créer une nouvelle grid
 # SHOULD I CHANGE THE DESIGN SO THAT THE FIRST TILE SELECTED IS AN EMPTY TILE # HOW
 # MAYBE ADD THE MIDDLE BUTTON MECHANIC/COMMAND FROM THE REAL MINESWEEPER GAME
 # ADD SMILEY BUTTON??
@@ -13,6 +14,9 @@ from functools import partial
 # ON THE GAME LOST WINDOW -> ASK TO EXIT OR PLAY AGAIN
 # ON THE GAME WON WINDOW -> ASK TO EXIT OR PLAY AGAIN
 
+def smiley_button_press():
+    pass
+
 def open_settings_window():
     settings_window = tk.Toplevel()
     settings_window.wm_title('Settings')
@@ -20,40 +24,31 @@ def open_settings_window():
     settings_window_frame = tk.Frame(settings_window)
     settings_window_frame.grid()
 
+    height = tk.StringVar()
     height_label = tk.Label(master=settings_window_frame, text='Height').grid(row=0, column=0)
-    global height_entry # GLOBAL :(
-    height_entry = tk.Entry(master=settings_window_frame).grid(row=0, column=1)
+    height_entry = tk.Entry(master=settings_window_frame, textvariable=height).grid(row=0, column=1)
+    height.set('9')
 
+    length = tk.StringVar()
     length_label = tk.Label(master=settings_window_frame, text='Length').grid(row=1, column=0)
-    global length_entry # GLOBAL :(
-    length_entry = tk.Entry(master=settings_window_frame).grid(row=1, column=1)
+    length_entry = tk.Entry(master=settings_window_frame, textvariable=length).grid(row=1, column=1)
+    length.set('9')
 
+    mines = tk.StringVar()
     mines_label = tk.Label(master=settings_window_frame, text='Number of Mines').grid(row=2, column=0)
-    global mines_entry # GLOBAL :(
-    mines_entry = tk.Entry(master=settings_window_frame).grid(row=2, column=1)
+    mines_entry = tk.Entry(master=settings_window_frame, textvariable=mines).grid(row=2, column=1)
+    mines.set('12')
 
     create_board_button = tk.Button(master=settings_window_frame,
                                     text='Create Board',
-                                    command=get_settings)
+                                    command=partial(get_settings, height, length, mines))
     create_board_button.grid(row=3)
 
-def get_settings():
-
-    # Check if entries were entered
-    if height_entry is not None:
-        height = height_entry.get()
-    else:
-        height = '9' # pas le plus clean
-
-    if length_entry is not None:
-        length = length_entry.get()
-    else:
-        length = '9' # pas le plus clean
-
-    if mines_entry is not None:
-        mines = mines_entry.get()
-    else:
-        mines = '12' # pas le plus clean
+def get_settings(height, length, mines):
+    height=height.get()
+    length=length.get()
+    mines=mines.get()
+    print((height, length, mines))
 
     # Check if the entries were numbers
     if height.isdigit():
@@ -74,10 +69,61 @@ def get_settings():
     else:
         mines = int(0.12345*length*height)
 
-    new_grid_window() ####
+    print((height, length, mines))
 
-def new_grid_window(): # CREATE FUNCTION THAT RECREATES THE WHOLE GRID AND SHIT WINDOW
-    pass
+    new_grid_window(height, length, mines)
+
+def new_grid_window(height, length, mines):
+    # Implement Reset Timer
+    # Implement Reset Flag Count
+
+    #frame_grid.forget()
+    #frame_grid.destroy()  <- METTRE EN CLASSE POUR POUVOIR IMPLEMENTER CA LOL. sinon ca empile les grids
+
+    game.create_board(length, height, mines)
+    game.board.create_random_grid()
+    game.board.change_0s_to_blank_spaces()
+
+    global list_buttons # GLOBAL :( -> to reset the list of buttons
+    list_buttons = []
+
+    # FRAME GRID
+    frame_grid=tk.Frame(frame_whole_window)
+    frame_grid.grid(row=1, column=0, padx=5, pady=10)
+    frame_grid.config(background='#C0C0C0')
+
+    # Create board seen by the user
+    for i, tile in enumerate(game.board.tiles):
+        column = i%game.board.grid_size[1]
+        row = i//game.board.grid_size[1]
+        photo = image_full_tile
+        btn = SpecialButton(frame_grid,
+                            tile=tile,
+                            text=str(tile.appearance),
+                            rrow=row,
+                            ccolumn=column,
+                            #height=int(30/game.board.grid_size[0]), # Might not change anything since the size is based on image size
+                            #width=int(90/game.board.grid_size[1]), # Might not change anything since the size is based on image size
+                            image=photo,
+                            )
+        btn.grid(row=row, column=column)
+        list_buttons.append(btn)
+
+
+
+def smiley_face_switch(won=None, lost=None): # Ca fait flasher l'écran
+    if smiley_button['image'] == 'pyimage14': # HARDCODED IMAGE
+        smiley_button['image'] = image_smiley_surprised
+
+    elif smiley_button['image'] == 'pyimage15': # HARDCODED IMAGE
+        smiley_button['image'] = image_smiley
+
+    if won is True:
+        smiley_button['image'] = image_smiley_won
+
+    if lost is True:
+        smiley_button['image'] = image_smiley_lost
+
 
 
 
@@ -115,6 +161,7 @@ class SpecialButton(tk.Button):
         self.bind("<Button-2>", self.flag)
 
     def flag(self, event):
+        smiley_face_switch()
         if self['text'] == 'F':
             self['text'] = self.tile.appearance
             self['image'] = image_full_tile # un peu weird de permettre de flagger des tiles révélées
@@ -126,6 +173,7 @@ class SpecialButton(tk.Button):
     def reveal(self, event):
         x, y = self.tile.position
         if self.board.board_as_grid_hidden[x][y] == '*':
+            smiley_face_switch(lost=True)
             end_game_window = tk.Toplevel()
             message = tk.Message(end_game_window, text='You lost.')
             message.pack()
@@ -137,6 +185,7 @@ class SpecialButton(tk.Button):
             self['image'] = image_red_mine
 
         elif self.board.board_as_grid_hidden[x][y] == ' ':
+            smiley_face_switch()
             surrounding_tiles = self.board.blank_space_BFS(self.position)
             for tile in surrounding_tiles:
                 tile_row, tile_col = tile
@@ -151,9 +200,11 @@ class SpecialButton(tk.Button):
             self['text'] = self.tile.val
             self['image'] = self.real_image
             self.tile.appearance = self.tile.val
+            smiley_face_switch()
 
         self.board.check_win_condition()
         if self.board.game_won:
+            smiley_face_switch(won=True)
             end_game_window = tk.Toplevel()
             message = tk.Message(end_game_window, text='You won!')
             message.pack()
@@ -171,7 +222,7 @@ list_buttons = []
 
 # Create behind the scenes board
 game = Minesweeper()
-game.create_board(9, 9, 10)
+game.create_board(9, 9, 3)
 #game.create_board(3, 3, 1)
 game.board.create_random_grid()
 game.board.change_0s_to_blank_spaces()
@@ -197,6 +248,10 @@ image_mine = tk.PhotoImage(file='images/mine.png')
 image_full_tile = tk.PhotoImage(file='images/full_tile.png')
 image_discovered_tile = tk.PhotoImage(file='images/empty_tile.png')
 image_red_mine = tk.PhotoImage(file='images/red_mine.png')
+image_smiley = tk.PhotoImage(file='images/smiley.png')
+image_smiley_surprised = tk.PhotoImage(file='images/smiley_surprised.png')
+image_smiley_won = tk.PhotoImage(file='images/smiley_won.png')
+image_smiley_lost = tk.PhotoImage(file='images/smiley_lost.png')
 
 # Add menu
 menubar = tk.Menu(root)
@@ -237,10 +292,11 @@ flag_count_placeholder = tk.Label(frame_flag_count,
 frame_smiley = tk.Frame(frame_over_grid)
 frame_smiley.grid(row=0, column= 1, padx=5, pady=5)
 frame_smiley.config(background='#C0C0C0') # MAYBE
-smiley_placeholder = tk.Label(frame_smiley,
+smiley_button = tk.Button(frame_smiley,
                                     text='smiley',
-                                    relief=tk.SUNKEN
-                                    ).grid()
+                                    image=image_smiley,
+                                    )
+smiley_button.grid(row=0)
 
 # FRAME TIME COUNTER
 frame_time_counter = tk.Frame(frame_over_grid)
@@ -253,16 +309,16 @@ counter_placeholder = tk.Label(frame_time_counter,
 
 
 # FRAME GRID
-frame=tk.Frame(frame_whole_window)
-frame.grid(row=1, column=0, padx=5, pady=10)
-frame.config(background='#C0C0C0')
+frame_grid=tk.Frame(frame_whole_window)
+frame_grid.grid(row=1, column=0, padx=5, pady=10)
+frame_grid.config(background='#C0C0C0')
 
 # Create board seen by the user
 for i, tile in enumerate(game.board.tiles):
     column = i%game.board.grid_size[1]
     row = i//game.board.grid_size[1]
     photo = image_full_tile
-    btn = SpecialButton(frame,
+    btn = SpecialButton(frame_grid,
                         tile=tile,
                         text=str(tile.appearance),
                         rrow=row,
