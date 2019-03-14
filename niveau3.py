@@ -155,9 +155,12 @@ class MinesweeperApp:
         self.image_smiley_won = tk.PhotoImage(file='images/smiley_won.png')
         self.image_smiley_lost = tk.PhotoImage(file='images/smiley_lost.png')
 
-    def new_grid_window(self, height, length, mines):
+    def new_grid_window(self, height, length, mines, window):
         # Implement Reset Timer
         # Implement Reset Flag Count
+
+        #Kill pop-up window
+        window.destroy()
 
         self.height = height
         self.length = length
@@ -195,7 +198,7 @@ class MinesweeperApp:
             btn.grid(row=row, column=column)
             self.list_buttons.append(btn)
 
-    def get_settings(self, height, length, mines):
+    def get_settings(self, height, length, mines, window):
         height=height.get()
         length=length.get()
         mines=mines.get()
@@ -219,7 +222,7 @@ class MinesweeperApp:
         else:
             mines = int(0.12345*length*height)
 
-        self.new_grid_window(height, length, mines)
+        self.new_grid_window(height, length, mines, window)
 
     def open_settings_window(self):
         # add label to say that if you leave a field blank it will either be a 9 long axis or an appropriate number of mines generated
@@ -246,7 +249,7 @@ class MinesweeperApp:
 
         create_board_button = tk.Button(master=settings_window_frame,
                                         text='Create Board',
-                                        command=partial(self.get_settings, height, length, mines))
+                                        command=partial(self.get_settings, height, length, mines, settings_window))
         create_board_button.grid(row=3)
 
     def spawn_end_game_window(self, won=None, lost=None):
@@ -264,7 +267,7 @@ class MinesweeperApp:
         message = tk.Label(end_game_window, text=text).grid(row=0)
         play_again_button = tk.Button(master=end_game_frame,
                                     text='Play Again.',
-                                    command=partial(self.new_grid_window, self.height, self.length, self.mines))
+                                    command=partial(self.new_grid_window, self.height, self.length, self.mines, end_game_window))
 
         play_again_button.grid(row=1, column=0)
         exit_button = tk.Button(master=end_game_frame,
