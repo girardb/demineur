@@ -112,7 +112,7 @@ class Minesweeper:
                 correct_input = True
             except InstructionError as error:
                 print(error)
-                print('you entered the number of mines incorrectly. You should try again.')
+                print('You entered the number of mines incorrectly. You should try again.')
 
         self.play_a_game(length_of_grid, height_of_grid, number_of_mines)
 
