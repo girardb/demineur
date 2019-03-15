@@ -33,7 +33,7 @@ class MinesweeperApp:
 
         helpmenu = tk.Menu(self.menubar, tearoff=0)
         helpmenu.add_command(label="You don't need help lol.", command=lambda: None)
-        self.menubar.add_cascade(label='?', menu=helpmenu)
+        self.menubar.add_cascade(label='Help', menu=helpmenu)
 
         # Display Menu
         self.root.config(menu=self.menubar)
@@ -169,6 +169,9 @@ class MinesweeperApp:
         self.game.board.change_0s_to_blank_spaces()
 
         self.list_buttons = []
+
+        # Reset Smiley
+        self.smiley_button['image'] = self.image_smiley
 
         # Reset Flag Count
         flags_count = self.game.board.flags_count
