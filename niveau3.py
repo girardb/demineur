@@ -11,13 +11,13 @@ from MinesweeperApp import MinesweeperApp
 # Rendre plus beau le win/lose screen?
 # Make menu friendlier ?
 # Le settings menu est laid un peu
+# Rajouter le question mark? Flag -> question mark -> vide
 
 # PAS OUBLIER DE FIX LES DEUX TESTS QUI FAIL POUR LE NIVEAU 2
 # Centrer le smiley # use button.place(relx=0.5, rely=0.5, anchor=tk.CENTER) # ou quelque chose du genre
 # ^ Faire sticker le timer et flag counter sur leur coté respectif
-# Reset la face quand une game fini
 # le smiley est supposé reset le jeu quand tu cliques dessus ou juste changer de smiley à surprised ?? lol
-
+# Le smiley face reset oublie les dimensions de la grille
 
 
 if __name__ == '__main__':

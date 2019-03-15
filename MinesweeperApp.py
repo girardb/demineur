@@ -4,19 +4,13 @@ from Counter import Counter
 from SpecialButton import SpecialButton
 from functools import partial
 
+
 class MinesweeperApp:
     def __init__(self):
-        self.list_buttons = []
-
-        # Create behind the scenes board
-        self.height=9
+        # Create the behind the scenes board
+        self.height= 9
         self.length = 9
         self.mines = 10
-
-        self.game = Minesweeper()
-        self.game.create_board(self.length, self.height, self.mines)
-        self.game.board.create_random_grid()
-        self.game.board.change_0s_to_blank_spaces()
 
         # Create window
         self.root = tk.Tk()
@@ -38,8 +32,6 @@ class MinesweeperApp:
         # Display Menu
         self.root.config(menu=self.menubar)
 
-
-
         # FRAME WHOLE WINDOW
         self.frame_whole_window = tk.Frame(self.root)
         self.frame_whole_window.grid()
@@ -49,21 +41,16 @@ class MinesweeperApp:
         self.frame_over_grid = tk.Frame(self.frame_whole_window)
         self.frame_over_grid.grid(row=0, column=0, padx=5, pady=5)
         self.frame_over_grid.config(background='#C0C0C0') # highlightbackground change rien sur les frames
-
+        self.frame_over_grid.rowconfigure(0, weight=1)
 
         # FRAME FLAG COUNT
-        self.frame_flag_count = tk.Canvas(self.frame_over_grid, width=45, height=25) # on dirait que le canvas lag des fois
+        self.frame_flag_count = tk.Canvas(self.frame_over_grid, width=45, height=25)
         self.frame_flag_count.grid(row = 0, column = 0, sticky=tk.W, padx=5, pady=5)
         self.frame_flag_count.config(background='black') # MAYBE
 
-        flags_count = self.game.board.flags_count
         self.counterDigit = Counter(self.frame_flag_count, 35, 5, 10, 3)
         self.counter10s = Counter(self.frame_flag_count, 20, 5, 10, 3)
         self.counter100s = Counter(self.frame_flag_count, 5, 5, 10, 3)
-
-        self.counterDigit.reveal_segments(flags_count%10)
-        self.counter10s.reveal_segments((flags_count//10)%10)
-        self.counter100s.reveal_segments((flags_count//100)%10)
 
         # FRAME SMILEY
         self.frame_smiley = tk.Frame(self.frame_over_grid)
@@ -72,7 +59,7 @@ class MinesweeperApp:
         self.smiley_button = tk.Button(self.frame_smiley,
                                             text='smiley',
                                             image=self.image_smiley,
-                                            command=self.smiley_face_switch,
+                                            command=self.call_new_grid_window,
                                             )
         self.smiley_button.grid(row=0)
 
@@ -91,34 +78,15 @@ class MinesweeperApp:
         self.time10s.reveal_segments(0)
         self.time100s.reveal_segments(0)
 
-
-        # FRAME GRID
-        self.frame_grid=tk.Frame(self.frame_whole_window)
-        self.frame_grid.grid(row=1, column=0, padx=5, pady=10)
-        self.frame_grid.config(background='#C0C0C0')
-
-        # Create board seen by the user
-        for i, tile in enumerate(self.game.board.tiles):
-            column = i%self.game.board.grid_size[1]
-            row = i//self.game.board.grid_size[1]
-            photo = self.image_full_tile
-            btn = SpecialButton(self.frame_grid,
-                                tile=tile,
-                                text=str(tile.appearance),
-                                rrow=row,
-                                ccolumn=column,
-                                image=photo,
-                                app=self,
-                                )
-            btn.grid(row=row, column=column)
-            self.list_buttons.append(btn)
+        self.create_hidden_and_button_board(self.length, self.height, self.mines)
+        self.reset_flag_count()
 
         # Update clock
         self.root.after(1000, self.update_clock)
 
         self.root.mainloop()
 
-    def smiley_face_switch(self, won=None, lost=None): # Ca fait flasher l'écran
+    def smiley_face_switch(self, won=None, lost=None):
         if self.smiley_button['image'] == 'pyimage14': # HARDCODED IMAGE
             self.smiley_button['image'] = self.image_smiley_surprised
 
@@ -151,59 +119,23 @@ class MinesweeperApp:
         self.image_smiley_won = tk.PhotoImage(file='images/smiley_won.png')
         self.image_smiley_lost = tk.PhotoImage(file='images/smiley_lost.png')
 
-    def new_grid_window(self, height, length, mines, window):
+    def call_new_grid_window(self):
+        self.new_grid_window(self.height, self.length, self.mines)
 
-        #Kill pop-up window
-        window.destroy()
-
+    def new_grid_window(self, height, length, mines):
         self.height = height
         self.length = length
         self.mines = mines
 
+        # Kill grid frame
         self.frame_grid.forget()
         self.frame_grid.destroy()
 
         # Create new board
-        self.game.create_board(length, height, mines)
-        self.game.board.create_random_grid()
-        self.game.board.change_0s_to_blank_spaces()
-
-        self.list_buttons = []
-
-        # Reset Smiley
-        self.smiley_button['image'] = self.image_smiley
+        self.create_hidden_and_button_board(length, height, mines)
 
         # Reset Flag Count
-        flags_count = self.game.board.flags_count
-        self.counterDigit.reveal_segments(flags_count%10)
-        self.counter10s.reveal_segments((flags_count//10)%10)
-        self.counter100s.reveal_segments((flags_count//100)%10)
-
-        # Reset Timer
-        self.time = 0
-        self.timer_status = False
-        self.update_clock
-
-        # FRAME GRID
-        self.frame_grid=tk.Frame(self.frame_whole_window)
-        self.frame_grid.grid(row=1, column=0, padx=5, pady=10)
-        self.frame_grid.config(background='#C0C0C0')
-
-        # Create board seen by the user
-        for i, tile in enumerate(self.game.board.tiles):
-            column = i%self.game.board.grid_size[1]
-            row = i//self.game.board.grid_size[1]
-            photo = self.image_full_tile
-            btn = SpecialButton(self.frame_grid,
-                                tile=tile,
-                                text=str(tile.appearance),
-                                rrow=row,
-                                ccolumn=column,
-                                image=photo,
-                                app=self,
-                                )
-            btn.grid(row=row, column=column)
-            self.list_buttons.append(btn)
+        self.reset_flag_count()
 
     def get_settings(self, height, length, mines, window):
         height=height.get()
@@ -229,7 +161,8 @@ class MinesweeperApp:
         else:
             mines = int(0.12345*length*height)
 
-        self.new_grid_window(height, length, mines, window)
+        # Kill pop-up window
+        self.create_board_and_destroy_window(height, length, mines, window)
 
     def open_settings_window(self):
         # add label to say that if you leave a field blank it will either be a 9 long axis or an appropriate number of mines generated
@@ -252,7 +185,7 @@ class MinesweeperApp:
         mines = tk.StringVar()
         mines_label = tk.Label(master=settings_window_frame, text='Number of Mines').grid(row=3, column=0)
         mines_entry = tk.Entry(master=settings_window_frame, textvariable=mines).grid(row=3, column=1)
-        mines.set('12')
+        mines.set('10')
 
         beginner_button = tk.Button(master=settings_window_frame,
                                         text='Beginner',
@@ -288,7 +221,7 @@ class MinesweeperApp:
         message = tk.Label(end_game_frame, text=text).grid(row=0)
         play_again_button = tk.Button(master=end_game_frame,
                                     text='Play Again',
-                                    command=partial(self.new_grid_window, self.height, self.length, self.mines, end_game_window))
+                                    command=partial(self.create_board_and_destroy_window, self.height, self.length, self.mines, end_game_window))
 
         play_again_button.grid(row=1, column=0)
         exit_button = tk.Button(master=end_game_frame,
@@ -321,3 +254,51 @@ class MinesweeperApp:
             height.set(16)
             length.set(30)
             mines.set(99)
+
+    def create_hidden_and_button_board(self, length, height, mines):
+        self.list_buttons = []
+        print((length, height, mines))
+        print((self.length, self.height, self.mines))
+        print()
+        self.game = Minesweeper()
+        self.game.create_board(length, height, mines)
+        self.game.board.create_random_grid()
+        self.game.board.change_0s_to_blank_spaces()
+
+        # CREATE GRID FRAME
+        self.frame_grid=tk.Frame(self.frame_whole_window)
+        self.frame_grid.grid(row=1, column=0, padx=5, pady=10)
+        self.frame_grid.config(background='#C0C0C0')
+
+        # Create board seen by the user
+        for i, tile in enumerate(self.game.board.tiles):
+            column = i%self.game.board.grid_size[1]
+            row = i//self.game.board.grid_size[1]
+            photo = self.image_full_tile
+            btn = SpecialButton(self.frame_grid,
+                                tile=tile,
+                                text=str(tile.appearance),
+                                rrow=row,
+                                ccolumn=column,
+                                image=photo,
+                                app=self,
+                                )
+            btn.grid(row=row, column=column)
+            self.list_buttons.append(btn)
+
+        # Reset Smiley
+        self.smiley_button['image'] = self.image_smiley
+
+        # Reset Timer
+        self.time = 0
+        self.timer_status = False
+
+    def reset_flag_count(self):
+        flags_count = self.game.board.flags_count
+        self.counterDigit.reveal_segments(flags_count%10)
+        self.counter10s.reveal_segments((flags_count//10)%10)
+        self.counter100s.reveal_segments((flags_count//100)%10)
+
+    def create_board_and_destroy_window(self, height, length, mines, window):
+        window.destroy()
+        self.new_grid_window(height, length, mines)

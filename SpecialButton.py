@@ -95,7 +95,9 @@ class SpecialButton(tk.Button):
             self.app.smiley_face_switch()
 
 
-        if not self.board.game_won: # Avec l'implémentation du mouse middle button ca executait la fonction plusieurs fois et faisais popper plusieurs fenetres
+        if not self.board.game_won:
+            # Avec l'implémentation du mouse middle button ca executait
+            # la fonction plusieurs fois et faisais popper plusieurs fenetres
             if self.board.check_win_condition():
                 self.app.smiley_face_switch(won=True)
                 self.app.spawn_end_game_window(won=True)

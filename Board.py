@@ -78,19 +78,17 @@ class Board:
         root = self.tiles[root_index]
 
         open_set.append(root)
+        visited.add(root.position)
 
         while open_set:
             subtree_root = open_set.popleft()
 
             for child in subtree_root.child:
-                if child.position in visited:
-                    continue
                 if child.position not in visited:
-                    if child.val != ' ':
-                        visited.add(child.position)
-                    elif child.val == ' ':
+                    visited.add(child.position)
+                    if child.val == ' ':
                         open_set.append(child)
-            visited.add(subtree_root.position)
+            #visited.add(subtree_root.position)
         return visited
 
     def print_board_seen_by_user(self): # suuuuuper long pour rien. Il faut changer ca.
