@@ -53,7 +53,7 @@ class MinesweeperApp:
 
         # FRAME FLAG COUNT
         self.frame_flag_count = tk.Canvas(self.frame_over_grid, width=45, height=25) # on dirait que le canvas lag des fois
-        self.frame_flag_count.grid(row = 0, column = 0, sticky=tk.W, padx=5, pady=5)
+        self.frame_flag_count.grid(row = 0, column = 0, sticky=tk.E, padx=5, pady=5)
         self.frame_flag_count.config(background='black') # MAYBE
 
         flags_count = self.game.board.flags_count
@@ -80,7 +80,7 @@ class MinesweeperApp:
         self.time = 0
         self.timer_status = False
         self.frame_time_counter = tk.Canvas(self.frame_over_grid, width=45, height=25)
-        self.frame_time_counter.grid(row = 0, column = 2, sticky=tk.E, padx=5, pady=5)
+        self.frame_time_counter.grid(row = 0, column = 2, sticky=tk.W, padx=5, pady=5)
         self.frame_time_counter.config(background='black') # MAYBE
 
         self.timeDigit = Counter(self.frame_time_counter, 35, 5, 10, 1)
@@ -173,8 +173,8 @@ class MinesweeperApp:
         # Reset Flag Count
         flags_count = self.game.board.flags_count
         self.counterDigit.reveal_segments(flags_count%10)
-        self.counter10s.reveal_segments(flags_count//10)
-        self.counter100s.reveal_segments(flags_count//100)
+        self.counter10s.reveal_segments((flags_count//10)%10)
+        self.counter100s.reveal_segments((flags_count//100)%10)
 
         # Reset Timer
         self.time = 0
@@ -196,8 +196,6 @@ class MinesweeperApp:
                                 text=str(tile.appearance),
                                 rrow=row,
                                 ccolumn=column,
-                                #height=int(30/game.board.grid_size[0]), # Might not change anything since the size is based on image size
-                                #width=int(90/game.board.grid_size[1]), # Might not change anything since the size is based on image size
                                 image=photo,
                                 app=self,
                                 )
@@ -286,7 +284,7 @@ class MinesweeperApp:
         if self.timer_status is True:
             self.time += 1
             self.timeDigit.reveal_segments(self.time%10)
-            self.time10s.reveal_segments(self.time//10)
-            self.time100s.reveal_segments(self.time//100)
+            self.time10s.reveal_segments((self.time//10)%10)
+            self.time100s.reveal_segments((self.time//100)%10)
 
         self.root.after(1000, self.update_clock)

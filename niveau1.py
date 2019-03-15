@@ -60,7 +60,7 @@ class MinesweeperFromStrings:
                     x_as_string += character
                 else:
                     y_as_string += character
-            self.grid_sizes.append((int(x_as_string), int(y_as_string)))
+            self.grid_sizes.append((int(y_as_string), int(x_as_string)))
 
     def recreate_grids_in_array(self):
         """Interprets the strings and recreates the grids in a 2D-array."""

@@ -78,10 +78,8 @@ class SpecialButton(tk.Button):
             self.app.smiley_face_switch()
             surrounding_tiles = self.board.blank_space_BFS(self.position)
             for tile in surrounding_tiles:
-                tile_row, tile_col = tile
-                for button in self.app.list_buttons:
-                    if button.tile.position == tile:
-                        btn = button
+                index = tile[0]*self.board.grid_size[1] + tile[1]
+                btn = self.app.list_buttons[index]
                 btn['text'] = btn.tile.val
                 btn.tile.appearance = btn.tile.val
                 btn['image'] = btn.real_image
@@ -104,3 +102,5 @@ class SpecialButton(tk.Button):
                 btn['image'] = btn.real_image
 
         # MAYBE ADD THE MIDDLE BUTTON MECHANIC/COMMAND FROM THE REAL MINESWEEPER GAME
+    def mouse_middle_button(self, event):
+        pass

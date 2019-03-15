@@ -1,13 +1,11 @@
 from MinesweeperApp import MinesweeperApp
 
 # TODO:
-# CHANGEMENTS AU NIVEAU 1 ---- y = nombres de row et x = nombres de colonnes
 # PAS OUBLIER DE FIX LES DEUX TESTS QUI FAIL POUR LE NIVEAU 2
 # Clean le code -> jviens de le copy paste dans une class donc c'est messy un peu beaucoup
 # ^ il y a genre un million d'attributs rattachés à un object MinesweeperApp. Jdevrais tu le breakdown encore plus? (breakdown en plus de classes)
 # SHOULD I CHANGE THE DESIGN SO THAT THE FIRST TILE SELECTED IS AN EMPTY TILE # HOW
 # MAYBE ADD THE MIDDLE BUTTON MECHANIC/COMMAND FROM THE REAL MINESWEEPER GAME
-
 # capoter si le user fait spawner plus de 999 mines et que le timer dépasse 999 secondes
 # ADD BORDERS --- jpas capable d'ajouter de border sur la grid. ca a l'air un peu off
 # Make menu friendlier
