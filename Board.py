@@ -3,8 +3,8 @@
 Creates the Board class for a Minesweeper Class to use in order to play
 a game of Minesweeper.
 """
+import collections
 import copy
-import queue
 import random
 from Tile import Tile
 
@@ -71,16 +71,16 @@ class Board:
 
     def blank_space_BFS(self, position):
         """Uses Breadth-first search to find all the adjacent blank tiles."""
-        open_set = queue.Queue()
+        open_set = collections.deque()
         visited = set()
 
-        for tile in self.tiles:
-            if tile.position == position:
-                root = tile
-        open_set.put(root)
+        root_index = position[0]*self.grid_size[1] + position[1]
+        root = self.tiles[root_index]
 
-        while not open_set.empty():
-            subtree_root = open_set.get()
+        open_set.append(root)
+
+        while open_set:
+            subtree_root = open_set.popleft()
 
             for child in subtree_root.child:
                 if child.position in visited:
@@ -89,7 +89,7 @@ class Board:
                     if child.val != ' ':
                         visited.add(child.position)
                     elif child.val == ' ':
-                        open_set.put(child)
+                        open_set.append(child)
             visited.add(subtree_root.position)
         return visited
 
@@ -128,7 +128,7 @@ class Board:
                 self.print_board_hidden_from_user()
                 self.bomb_hit = True
 
-            elif self.board_as_grid_hidden[pos_r][pos_c] == ' ': # Changed here for blank spaces
+            elif self.board_as_grid_hidden[pos_r][pos_c] == ' ':
                 surrounding_tiles = self.blank_space_BFS(position)
                 for tile in surrounding_tiles:
                     tile_x, tile_y = tile

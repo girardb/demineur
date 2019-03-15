@@ -33,12 +33,14 @@ class SpecialButton(tk.Button):
 
         self.bind("<Button-1>", self.reveal)
         self.bind("<Button-2>", self.flag)
+        self.bind("<Button-3>", self.mouse_middle_button)
 
     def flag(self, event): # rajouter le point d'interrogation là-dedans
         self.app.smiley_face_switch()
         if self['text'] == 'F':
-            self['text'] = self.tile.appearance
+            self['text'] = '-' # non discovered tile -> makes this easier than to remember what it was. I might want to add an attribute to remember what it was when the user discovered though. Or remember if it was discovered already (bool).
             self['image'] = self.app.image_full_tile # un peu weird de permettre de flagger des tiles révélées
+            self.tile.appearance = '-'
 
             # update flags
             self.app.game.board.flags_count += 1
@@ -51,12 +53,13 @@ class SpecialButton(tk.Button):
             self['text'] = 'F'
             self['image'] = self.app.image_flag
             self.app.game.board.flags_count -= 1
+            self.tile.appearance = 'F' # ------------
 
             # update flags
             flags_count = self.app.game.board.flags_count
             self.app.counterDigit.reveal_segments(flags_count%10)
-            self.app.counter10s.reveal_segments(flags_count//10)
-            self.app.counter100s.reveal_segments(flags_count//100)
+            self.app.counter10s.reveal_segments((flags_count//10)%10)
+            self.app.counter100s.reveal_segments((flags_count//100)%10)
 
     def reveal(self, event):
         #if self.app.timer_status is not True:
@@ -64,15 +67,16 @@ class SpecialButton(tk.Button):
 
         x, y = self.tile.position
         if self.board.board_as_grid_hidden[x][y] == '*':
-            self.app.smiley_face_switch(lost=True)
-            self.app.spawn_end_game_window(lost=True)
-            self.app.timer_status = False
+            if self.app.timer_status:
+                self.app.timer_status = False
+                self.app.smiley_face_switch(lost=True)
+                self.app.spawn_end_game_window(lost=True)
 
-            # Reveal board
-            for btn in self.app.list_buttons:
-                btn['text'] = btn.tile.val
-                btn['image'] = btn.real_image
-            self['image'] = self.app.image_red_mine
+                # Reveal board
+                for btn in self.app.list_buttons:
+                    btn['text'] = btn.tile.val
+                    btn['image'] = btn.real_image
+                self['image'] = self.app.image_red_mine
 
         elif self.board.board_as_grid_hidden[x][y] == ' ':
             self.app.smiley_face_switch()
@@ -90,17 +94,30 @@ class SpecialButton(tk.Button):
             self.tile.appearance = self.tile.val
             self.app.smiley_face_switch()
 
-        self.board.check_win_condition()
-        if self.board.game_won:
-            self.app.smiley_face_switch(won=True)
-            self.app.spawn_end_game_window(won=True)
-            self.app.timer_status = False
 
-            # Reveal board
-            for btn in self.app.list_buttons:
-                btn['text'] = btn.tile.val
-                btn['image'] = btn.real_image
+        if not self.board.game_won: # Avec l'implémentation du mouse middle button ca executait la fonction plusieurs fois et faisais popper plusieurs fenetres
+            if self.board.check_win_condition():
+                self.app.smiley_face_switch(won=True)
+                self.app.spawn_end_game_window(won=True)
+                self.app.timer_status = False
 
-        # MAYBE ADD THE MIDDLE BUTTON MECHANIC/COMMAND FROM THE REAL MINESWEEPER GAME
+                # Reveal board
+                for btn in self.app.list_buttons:
+                    btn['text'] = btn.tile.val
+                    btn['image'] = btn.real_image
+
     def mouse_middle_button(self, event):
-        pass
+        flag_count = 0
+        adjacent_buttons = []
+        adjacent_positions = self.tile.adjacent_positions
+        for tile in adjacent_positions:
+            tile_index = tile[0]*self.board.grid_size[1] + tile[1]
+            adjacent_buttons.append(self.app.list_buttons[tile_index])
+
+            if self.board.tiles[tile_index].appearance == 'F':
+                flag_count += 1
+
+        if flag_count == self.tile.appearance:
+            for button in adjacent_buttons:
+                if button.tile.appearance != 'F':
+                    SpecialButton.reveal(button, "<Button-1>")

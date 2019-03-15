@@ -53,17 +53,17 @@ class MinesweeperApp:
 
         # FRAME FLAG COUNT
         self.frame_flag_count = tk.Canvas(self.frame_over_grid, width=45, height=25) # on dirait que le canvas lag des fois
-        self.frame_flag_count.grid(row = 0, column = 0, sticky=tk.E, padx=5, pady=5)
+        self.frame_flag_count.grid(row = 0, column = 0, sticky=tk.W, padx=5, pady=5)
         self.frame_flag_count.config(background='black') # MAYBE
 
         flags_count = self.game.board.flags_count
-        self.counterDigit = Counter(self.frame_flag_count, 35, 5, 10, 1)
-        self.counter10s = Counter(self.frame_flag_count, 20, 5, 10, 1)
-        self.counter100s = Counter(self.frame_flag_count, 5, 5, 10, 1)
+        self.counterDigit = Counter(self.frame_flag_count, 35, 5, 10, 3)
+        self.counter10s = Counter(self.frame_flag_count, 20, 5, 10, 3)
+        self.counter100s = Counter(self.frame_flag_count, 5, 5, 10, 3)
 
         self.counterDigit.reveal_segments(flags_count%10)
-        self.counter10s.reveal_segments(flags_count//10)
-        self.counter100s.reveal_segments(flags_count//100)
+        self.counter10s.reveal_segments((flags_count//10)%10)
+        self.counter100s.reveal_segments((flags_count//100)%10)
 
         # FRAME SMILEY
         self.frame_smiley = tk.Frame(self.frame_over_grid)
@@ -80,12 +80,12 @@ class MinesweeperApp:
         self.time = 0
         self.timer_status = False
         self.frame_time_counter = tk.Canvas(self.frame_over_grid, width=45, height=25)
-        self.frame_time_counter.grid(row = 0, column = 2, sticky=tk.W, padx=5, pady=5)
+        self.frame_time_counter.grid(row = 0, column = 2, sticky=tk.E, padx=5, pady=5)
         self.frame_time_counter.config(background='black') # MAYBE
 
-        self.timeDigit = Counter(self.frame_time_counter, 35, 5, 10, 1)
-        self.time10s = Counter(self.frame_time_counter, 20, 5, 10, 1)
-        self.time100s = Counter(self.frame_time_counter, 5, 5, 10, 1)
+        self.timeDigit = Counter(self.frame_time_counter, 35, 5, 10, 3)
+        self.time10s = Counter(self.frame_time_counter, 20, 5, 10, 3)
+        self.time100s = Counter(self.frame_time_counter, 5, 5, 10, 3)
 
         self.timeDigit.reveal_segments(0)
         self.time10s.reveal_segments(0)
@@ -207,7 +207,7 @@ class MinesweeperApp:
         length=length.get()
         mines=mines.get()
         # HERE I CAN PROBABLY USE minesweeper.check_grid_configuration_inputs()
-        # Check if the entries were numbers
+        # Check if the entries are numbers
         if height.isdigit():
             height = int(height)
         else:
@@ -237,24 +237,38 @@ class MinesweeperApp:
         settings_window_frame.grid()
 
         height = tk.StringVar()
-        height_label = tk.Label(master=settings_window_frame, text='Height').grid(row=0, column=0)
-        height_entry = tk.Entry(master=settings_window_frame, textvariable=height).grid(row=0, column=1)
+        height_label = tk.Label(master=settings_window_frame, text='Height').grid(row=1, column=0)
+        height_entry = tk.Entry(master=settings_window_frame, textvariable=height).grid(row=1, column=1)
         height.set('9')
 
         length = tk.StringVar()
-        length_label = tk.Label(master=settings_window_frame, text='Length').grid(row=1, column=0)
-        length_entry = tk.Entry(master=settings_window_frame, textvariable=length).grid(row=1, column=1)
+        length_label = tk.Label(master=settings_window_frame, text='Length').grid(row=2, column=0)
+        length_entry = tk.Entry(master=settings_window_frame, textvariable=length).grid(row=2, column=1)
         length.set('9')
 
         mines = tk.StringVar()
-        mines_label = tk.Label(master=settings_window_frame, text='Number of Mines').grid(row=2, column=0)
-        mines_entry = tk.Entry(master=settings_window_frame, textvariable=mines).grid(row=2, column=1)
+        mines_label = tk.Label(master=settings_window_frame, text='Number of Mines').grid(row=3, column=0)
+        mines_entry = tk.Entry(master=settings_window_frame, textvariable=mines).grid(row=3, column=1)
         mines.set('12')
+
+        beginner_button = tk.Button(master=settings_window_frame,
+                                        text='Beginner',
+                                        command=partial(self.set_difficulty, height, length, mines, settings_window, 0))
+        beginner_button.grid(row=0, column=0)
+        medium_button = tk.Button(master=settings_window_frame,
+                                        text='Medium',
+                                        command=partial(self.set_difficulty, height, length, mines, settings_window, 1))
+        medium_button.grid(row=0, column=1)
+        hard_button = tk.Button(master=settings_window_frame,
+                                        text='Hard',
+                                        command=partial(self.set_difficulty, height, length, mines, settings_window, 2))
+        hard_button.grid(row=0, column=2)
+
 
         create_board_button = tk.Button(master=settings_window_frame,
                                         text='Create Board',
                                         command=partial(self.get_settings, height, length, mines, settings_window))
-        create_board_button.grid(row=3)
+        create_board_button.grid(row=4, columnspan=3)
 
     def spawn_end_game_window(self, won=None, lost=None):
         # The buttons spawn on top of the label
@@ -268,14 +282,14 @@ class MinesweeperApp:
         if lost is True:
             text='You lost.'
 
-        message = tk.Label(end_game_window, text=text).grid(row=0)
+        message = tk.Label(end_game_frame, text=text).grid(row=0)
         play_again_button = tk.Button(master=end_game_frame,
-                                    text='Play Again.',
+                                    text='Play Again',
                                     command=partial(self.new_grid_window, self.height, self.length, self.mines, end_game_window))
 
         play_again_button.grid(row=1, column=0)
         exit_button = tk.Button(master=end_game_frame,
-                                text='Exit.',
+                                text='Exit',
                                 command=self.root.destroy)
 
         exit_button.grid(row=1, column=1)
@@ -288,3 +302,19 @@ class MinesweeperApp:
             self.time100s.reveal_segments((self.time//100)%10)
 
         self.root.after(1000, self.update_clock)
+
+    def set_difficulty(self, height, length, mines, settings_window, difficulty):
+        if difficulty == 0:
+            height.set(9)
+            length.set(9)
+            mines.set(10)
+
+        elif difficulty == 1:
+            height.set(16)
+            length.set(16)
+            mines.set(40)
+
+        elif difficulty == 2:
+            height.set(16)
+            length.set(30)
+            mines.set(99)
