@@ -125,8 +125,11 @@ class Minesweeper:
         if user_input == 'quit':
             quit()
 
+        if not user_input.strip():
+            raise InstructionError("You can't submit an empty string.")
+
         player_move = user_input.split()
-        position = player_move[0].strip('().').split(',')
+        position = player_move[0].strip('(). ').split(',')
 
         for i in position:
             if not i.strip('-').isdigit():

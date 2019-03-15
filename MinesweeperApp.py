@@ -257,9 +257,6 @@ class MinesweeperApp:
 
     def create_hidden_and_button_board(self, length, height, mines):
         self.list_buttons = []
-        print((length, height, mines))
-        print((self.length, self.height, self.mines))
-        print()
         self.game = Minesweeper()
         self.game.create_board(length, height, mines)
         self.game.board.create_random_grid()
