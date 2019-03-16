@@ -66,26 +66,27 @@ class MinesweeperFromStrings:
         """Interprets the strings and recreates the grids in a 2D-array."""
         grids_one_dimension = [list(grid.strip('0123456789xy')) for grid in self.grids_as_string]
 
-        # Assuming that the number of mines/empty positions sent correspond to height*length
-        # AKA assuming that the input is valid (#Might need to implement something to check that.)
-
         for grid_number, grid in enumerate(grids_one_dimension):
-            grid_to_append = []
-            row_to_append = []
-            mines = []
-            for character_index, character in enumerate(grid):
-                if character_index % self.grid_sizes[grid_number][1] == 0 and character_index != 0:
-                    grid_to_append.append(row_to_append)
-                    row_to_append = []
-                row_to_append.append(character)
+            if self.grid_sizes[grid_number][0]*self.grid_sizes[grid_number][1] == len(grid):
+                grid_to_append = []
+                row_to_append = []
+                mines = []
+                for character_index, character in enumerate(grid):
+                    if character_index % self.grid_sizes[grid_number][1] == 0 and character_index != 0:
+                        grid_to_append.append(row_to_append)
+                        row_to_append = []
+                    row_to_append.append(character)
 
-                # Remember the position of the mines
-                if character == '*':
-                    mines.append((character_index // self.grid_sizes[grid_number][1], character_index % self.grid_sizes[grid_number][1]))
+                    # Remember the position of the mines
+                    if character == '*':
+                        mines.append((character_index // self.grid_sizes[grid_number][1], character_index % self.grid_sizes[grid_number][1]))
 
-            grid_to_append.append(row_to_append) # Ugly
-            self.grids.append(grid_to_append)
-            self.mine_positions_per_grid.append(mines)
+                grid_to_append.append(row_to_append)
+                self.grids.append(grid_to_append)
+                self.mine_positions_per_grid.append(mines)
+            else:
+                self.grids.append('Not a valid grid input.')
+                self.mine_positions_per_grid.append('Not a valid grid input.')
 
     def niveau_1_print_from_file(self, text_file_with_grids_as_string):
         """This method uses the other methods to pipeline actions in the right order."""

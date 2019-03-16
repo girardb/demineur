@@ -64,8 +64,8 @@ class Board:
             row_hidden = []
             row_user = []
             for j in range(self.grid_size[1]):
-                row_hidden.append(str(self.tiles[i*self.grid_size[1] + j].val)) ###
-                row_user.append(str(self.tiles[i*self.grid_size[1] + j].appearance)) ###
+                row_hidden.append(str(self.tiles[i*self.grid_size[1] + j].val))
+                row_user.append(str(self.tiles[i*self.grid_size[1] + j].appearance))
             self.board_as_grid_hidden.append(row_hidden)
             self.board_as_grid_user.append(row_user)
 
@@ -82,16 +82,14 @@ class Board:
 
         while open_set:
             subtree_root = open_set.popleft()
-
             for child in subtree_root.child:
                 if child.position not in visited:
                     visited.add(child.position)
                     if child.val == ' ':
                         open_set.append(child)
-            #visited.add(subtree_root.position)
         return visited
 
-    def print_board_seen_by_user(self): # suuuuuper long pour rien. Il faut changer ca.
+    def print_board_seen_by_user(self):
         """Prints the board state as seen by the user."""
         grid_to_print = copy.deepcopy(self.board_as_grid_user)
         first_row = [' ', ' '] + [str(i) for i in range(self.grid_size[1])]
@@ -154,7 +152,6 @@ class Board:
 
     def change_0s_to_blank_spaces(self):
         """Changes the 0s in the grid seen by the user by blank spaces."""
-        # C'est clair qu'il y a une manière plus efficace de faire ca
         for tile in self.tiles:
             if tile.val == 0:
                 tile.val = ' '
@@ -164,7 +161,7 @@ class Board:
                 if self.board_as_grid_user[pos_r][pos_c] == '0':
                     self.board_as_grid_user[pos_r][pos_c] = ' '
 
-        for pos_r, row in enumerate(self.board_as_grid_hidden): # Même code que lui en haut. jpeux les merge
+        for pos_r, row in enumerate(self.board_as_grid_hidden):
             for pos_c in range(len(row)):
                 if self.board_as_grid_hidden[pos_r][pos_c] == '0':
                     self.board_as_grid_hidden[pos_r][pos_c] = ' '

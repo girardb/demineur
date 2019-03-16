@@ -1,7 +1,9 @@
-import tkinter as tk
+"""Class for a tkinter 7-segment display."""
 
 class Counter:
+    """This class creates the necessary methods to create a 7-segment display with tkinter."""
     def __init__(self, frame, position_x, position_y, length_segment, width_segment):
+        """This method creates a hidden display on a specific tkinter frame."""
         self.frame = frame
         self.length_segment = length_segment
         self.width_segment = width_segment
@@ -38,6 +40,7 @@ class Counter:
                 width=self.width_segment, fill='red', state='hidden'))
 
     def reveal_segments(self, digit):
+        """Updates the display to the correct digit."""
         for i, segment in enumerate(self.which_segments_are_on_for_each_digit[digit]):
             if segment == 1:
                 self.frame.itemconfigure(self.all_segments[i], state='normal')

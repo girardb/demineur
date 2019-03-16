@@ -1,12 +1,17 @@
+"""Creates the MinesweeperApp class that implements a UI for a Minesweeper game."""
+
 import tkinter as tk
+from functools import partial
 from Minesweeper import Minesweeper
 from Counter import Counter
 from SpecialButton import SpecialButton
-from functools import partial
+
 
 
 class MinesweeperApp:
+    """This class manages the UI for a Minesweeper game."""
     def __init__(self):
+        """Creates the initial window along with a random Minesweeper grid."""
         # Create the behind the scenes board
         self.height= 9
         self.length = 9
@@ -40,13 +45,12 @@ class MinesweeperApp:
         # FRAME OVER GRID
         self.frame_over_grid = tk.Frame(self.frame_whole_window)
         self.frame_over_grid.grid(row=0, column=0, padx=5, pady=5)
-        self.frame_over_grid.config(background='#C0C0C0') # highlightbackground change rien sur les frames
-        self.frame_over_grid.rowconfigure(0, weight=1)
+        self.frame_over_grid.config(background='#C0C0C0')
 
         # FRAME FLAG COUNT
         self.frame_flag_count = tk.Canvas(self.frame_over_grid, width=45, height=25)
         self.frame_flag_count.grid(row = 0, column = 0, sticky=tk.W, padx=5, pady=5)
-        self.frame_flag_count.config(background='black') # MAYBE
+        self.frame_flag_count.config(background='black')
 
         self.counterDigit = Counter(self.frame_flag_count, 35, 5, 10, 3)
         self.counter10s = Counter(self.frame_flag_count, 20, 5, 10, 3)
@@ -55,7 +59,7 @@ class MinesweeperApp:
         # FRAME SMILEY
         self.frame_smiley = tk.Frame(self.frame_over_grid)
         self.frame_smiley.grid(row=0, column= 1, padx=5, pady=5)
-        self.frame_smiley.config(background='#C0C0C0') # MAYBE
+        self.frame_smiley.config(background='#C0C0C0')
         self.smiley_button = tk.Button(self.frame_smiley,
                                             text='smiley',
                                             image=self.image_smiley,
@@ -68,7 +72,7 @@ class MinesweeperApp:
         self.timer_status = False
         self.frame_time_counter = tk.Canvas(self.frame_over_grid, width=45, height=25)
         self.frame_time_counter.grid(row = 0, column = 2, sticky=tk.E, padx=5, pady=5)
-        self.frame_time_counter.config(background='black') # MAYBE
+        self.frame_time_counter.config(background='black')
 
         self.timeDigit = Counter(self.frame_time_counter, 35, 5, 10, 3)
         self.time10s = Counter(self.frame_time_counter, 20, 5, 10, 3)
@@ -78,6 +82,7 @@ class MinesweeperApp:
         self.time10s.reveal_segments(0)
         self.time100s.reveal_segments(0)
 
+        # Creates the grid.
         self.create_hidden_and_button_board(self.length, self.height, self.mines)
         self.reset_flag_count()
 
@@ -87,10 +92,11 @@ class MinesweeperApp:
         self.root.mainloop()
 
     def smiley_face_switch(self, won=None, lost=None):
-        if self.smiley_button['image'] == 'pyimage14': # HARDCODED IMAGE
+        """Swaps the smiley and surprised smiley face on mouse click."""
+        if self.smiley_button['image'] == 'pyimage14':
             self.smiley_button['image'] = self.image_smiley_surprised
 
-        elif self.smiley_button['image'] == 'pyimage15': # HARDCODED IMAGE
+        elif self.smiley_button['image'] == 'pyimage15':
             self.smiley_button['image'] = self.image_smiley
 
         if won is True:
@@ -100,6 +106,7 @@ class MinesweeperApp:
             self.smiley_button['image'] = self.image_smiley_lost
 
     def load_images(self):
+        """Loads all the images used in the UI."""
         # Load images
         self.image_tile_1 = tk.PhotoImage(file='images/tile_1.png')
         self.image_tile_2 = tk.PhotoImage(file='images/tile_2.png')
@@ -120,29 +127,36 @@ class MinesweeperApp:
         self.image_smiley_lost = tk.PhotoImage(file='images/smiley_lost.png')
 
     def call_new_grid_window(self):
+        """Calls the function to create a new grid.
+
+        It is used here because when using the partial function with self
+        arguments, the smiley face reset would not remember the size of the grid
+        specified by the user because of the nature of partial.
+        """
         self.new_grid_window(self.height, self.length, self.mines)
 
     def new_grid_window(self, height, length, mines):
+        """Creates a new grid on the main window."""
         self.height = height
         self.length = length
         self.mines = mines
 
-        # Kill grid frame
+        # Kills grid frame
         self.frame_grid.forget()
         self.frame_grid.destroy()
 
-        # Create new board
+        # Creates new board
         self.create_hidden_and_button_board(length, height, mines)
 
-        # Reset Flag Count
+        # Resets Flag Count
         self.reset_flag_count()
 
     def get_settings(self, height, length, mines, window):
+        """Gets the grid settings from the settings window."""
         height=height.get()
         length=length.get()
         mines=mines.get()
-        # HERE I CAN PROBABLY USE minesweeper.check_grid_configuration_inputs()
-        # Check if the entries are numbers
+
         if height.isdigit():
             height = int(height)
         else:
@@ -165,7 +179,7 @@ class MinesweeperApp:
         self.create_board_and_destroy_window(height, length, mines, window)
 
     def open_settings_window(self):
-        # add label to say that if you leave a field blank it will either be a 9 long axis or an appropriate number of mines generated
+        """Opens the settings window."""
         settings_window = tk.Toplevel()
         settings_window.wm_title('Settings')
 
@@ -191,10 +205,12 @@ class MinesweeperApp:
                                         text='Beginner',
                                         command=partial(self.set_difficulty, height, length, mines, settings_window, 0))
         beginner_button.grid(row=0, column=0)
+
         medium_button = tk.Button(master=settings_window_frame,
                                         text='Medium',
                                         command=partial(self.set_difficulty, height, length, mines, settings_window, 1))
         medium_button.grid(row=0, column=1)
+
         hard_button = tk.Button(master=settings_window_frame,
                                         text='Hard',
                                         command=partial(self.set_difficulty, height, length, mines, settings_window, 2))
@@ -207,7 +223,7 @@ class MinesweeperApp:
         create_board_button.grid(row=4, columnspan=3)
 
     def spawn_end_game_window(self, won=None, lost=None):
-        # The buttons spawn on top of the label
+        """Spawns the window at the end of a game."""
         end_game_window = tk.Toplevel()
         end_game_frame = tk.Frame(end_game_window)
         end_game_frame.grid()
@@ -231,6 +247,7 @@ class MinesweeperApp:
         exit_button.grid(row=1, column=1)
 
     def update_clock(self):
+        """Updates the clock."""
         if self.timer_status is True:
             self.time += 1
             self.timeDigit.reveal_segments(self.time%10)
@@ -240,6 +257,7 @@ class MinesweeperApp:
         self.root.after(1000, self.update_clock)
 
     def set_difficulty(self, height, length, mines, settings_window, difficulty):
+        """Updates the settings fields on the settings window."""
         if difficulty == 0:
             height.set(9)
             length.set(9)
@@ -256,6 +274,7 @@ class MinesweeperApp:
             mines.set(99)
 
     def create_hidden_and_button_board(self, length, height, mines):
+        """It creates a new Minesweeper grid."""
         self.list_buttons = []
         self.game = Minesweeper()
         self.game.create_board(length, height, mines)
@@ -267,7 +286,7 @@ class MinesweeperApp:
         self.frame_grid.grid(row=1, column=0, padx=5, pady=10)
         self.frame_grid.config(background='#C0C0C0')
 
-        # Create board seen by the user
+        # Creates board seen by the user
         for i, tile in enumerate(self.game.board.tiles):
             column = i%self.game.board.grid_size[1]
             row = i//self.game.board.grid_size[1]
@@ -291,11 +310,13 @@ class MinesweeperApp:
         self.timer_status = False
 
     def reset_flag_count(self):
+        """Resets the flag count to the number of mines on the grid."""
         flags_count = self.game.board.flags_count
         self.counterDigit.reveal_segments(flags_count%10)
         self.counter10s.reveal_segments((flags_count//10)%10)
         self.counter100s.reveal_segments((flags_count//100)%10)
 
     def create_board_and_destroy_window(self, height, length, mines, window):
+        """Destroys the window from which it was called and creates a new grid."""
         window.destroy()
         self.new_grid_window(height, length, mines)
